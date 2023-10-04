@@ -1,0 +1,138 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[margin=2cm, bottom=2cm]{geometry}
+% \usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{calc}
+% \usepackage{slashbox}
+\usepackage{bbold}
+\usepackage{array}
+      
+\usepackage{alltt}
+\usepackage{pstricks-add}
+\usepackage{pstricks}
+
+% \usepackage{fancyhdr}
+% \pagestyle{fancy}
+% \fancyhead{}
+% \lhead{}
+% \rhead{}
+% \chead{}
+% \renewcommand{\headrulewidth}{0pt}
+% \renewcommand{\footrulewidth}{0.4pt}
+% \rfoot{\footnotesize{TP 1}}
+% \cfoot{}
+
+\title{TP 1 - Analyse des données multi-dimensionnelles}
+\author{Guillaume BOULAND\\ Camille MOTTIER}
+\date{}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\vs}[1]{\vspace{#1cm}}
+\newcommand{\hs}[1]{\hspace{#1cm}}
+% 
+\newcommand{\dsum}[2]{\displaystyle\sum_{#1}^{#2}}
+% \newcommand{\dint}[2]{\displaystyle\int_{#1}^{#2}}
+% \newcommand{\ben}{\begin{enumerate}}
+% \newcommand{\een}{\end{enumerate}}
+% \newcommand{\bit}{\begin{itemize}}
+% \newcommand{\eit}{\end{itemize}}
+
+
+\setlength{\parindent}{0pt}
+
+
+\begin{document}
+\maketitle
+
+\
+
+\section{Partie I}
+\subsection{Données quantitatives}
+Nous étudions ici des données relatives aux vins de Loire, contenues dans le fichier \texttt{wines.csv}. Dans se fichier, sont présentés 21 vins selon le type d'appellations, de sol et de 29 paramètres quantitatifs d'intensités sensorielles. \\
+
+\textit{Extrait du tableau d'origine}\\
+
+Nous commençons par extraire du tableau les variables quantitatives, puis nous les centrons et les réduisons afin de les ramener à une échelle comparable de valeurs. Nous considérons pour cela que les vins sont associés à un même poids : $\frac 1{21}$. 
+Nous appellerons par la suite $X$ ce nouveau tableau et $(x_i^j)$ ses composantes.\\
+
+\textit{Extrait du tableau centré-réduit}\\
+
+\underline{Barycentre du nuage de points} :\\
+
+Le barycentre $\overline{x}$ de ce nuage de points se trouve à l'origine. En effet, les variables étant centrées, nous avons : $$\forall j\in[\![1,29]\!],~\overline{x^j}=\dsum{i=1}{21}\frac 1{21}x_i^j=0.$$
+
+En notant $W$ la matrice diagonale de $\mathcal M_{21}(\R)$ des poids de chaque vin et $\mathbb 1$ la matrice colonne de $\mathcal  M_{21,1}(\R)$ composée de 1, nous obtenons aussi $\overline x$ par le produit matriciel $\overline x^T=X^TW\mathbb 1$, ce qui est exploité informatiquement pour vérifier le résultat précédent.\\
+
+\textit{Extrait du résultat obtenu ?} \\
+
+\underline{Inertie du nuage de points} :\\
+
+Considérant la métrique canonique $I$ sur $\R^{29}$, nous obtenons l'inertie du nuage de points : 
+$$\begin{array}{ll}
+In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}
+&=\dsum{i=1}{21}\frac 1{21}|\!|x_i|\!|^2_I\\
+&=\dsum{i=1}{21}\frac 1{21}\dsum{j=1}{29}(x_i^j)^2\\
+&=\dsum{j=1}{29}\dsum{i=1}{21}\frac 1{21}(x_i^j)^2\\
+&=\dsum{j=1}{29}V(x^j) \hs{1} \text{car les $x^j$ sont centrés}\\
+&=29 \hs1 \text{car les $x^j$ sont réduits}
+\end{array}$$
+Résultat que nous retrouvons bien informatiquement. 
+
+
+
+
+
+
+\subsection{Partition par appellations}
+
+Les vins sont séparés en trois appellations : Bourgueuil, Chinon et Saumur. \\
+Nous noterons $Y=(y_i^k)\in\mathcal M_{21,3}(\R)$ la matrice dont les colonnes sont les indicatrices d'appellations. \\
+Les poids des trois appellations sont obtenus par le produit matriciel $Y^TW\mathbb 1$. \\
+En effet, pour tout $k\in\{1,2,3\}$, $\dsum{i=1}{21}y_i^kw_i=\dsum{i/y_i=k}{}w_i=W^k$.\\
+Nous obtenons alors informatiquement les valeurs suivantes. \\
+
+\textit{Résultat}\\
+
+{\red à développer ???} De manière similaire, les barycentres au sein des trois appellations sont obtenus par le calcul matriciel $(\overline x^k)_{1\leqslant k\leqslant 3} =(Y^TWY)^{-1}(Y^TWX)\in \mathcal M_{3,29}(\R)$. En effet, $Y^TWY$ est la matrice diagonale des poids des appellations et $Y^TWX=\left(\dsum{i/y_i=k}{}w_ix_i^j\right)_{k,j}$ est la matrice des ``pseudo-moyennes'' par appellation.\\
+
+\textit{Extrait des résultats}\\
+
+Ces trois barycentres ont pour norme ...\\
+
+On obtient alors l'inertie inter-appellations : 
+$$In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}=\dsum{k=1}3W^k|\!|\overline x^k|\!|_I^2\simeq \text{\red valeur approchée}$$
+
+puis le $R^2$ de la partition des vins en appellations : 
+$$R^2=\dfrac{In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}}{In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}}\simeq \text{\red valeur approchée}$$
+
+Nous constatons ainsi que la part des appellations dans les disparités sensorielles des vins est d'environ $11\%$.
+
+\subsection{Influence de l'appellation sur les différentes variables sensorielles}
+
+Il s'agit ici d'étudier séparément l'influence des appellations sur chaque variable sensorielle. On calcule donc pour chacune d'entre elles :
+$$(R^2)^j=\dfrac{\dsum{k=1}3W^k(\overline{x^j}^k)^2}{V(x^j)}=\dsum{k=1}3W^k(\overline{x^j}^k)^2$$
+
+\textit{Extrait du résultat}\\
+
+Nous constatons que l'appellation est la moins influente sur les variables intitulées ``Spice.before.shaking'', ``Quality.of.odor'', ``Fruity'' et ``Flower'', avec une influence de moins de $1\%$, tandis qu'elle est la plus influente sur les variables intitulées ``Odor.intensity.before.shaking'', ``Odor.intensity'' et ``Phenolic'', avec une influence de plus de $30\%$. \\
+
+Notons que le $R^2$ de la partition est égal à la moyenne arithmétique des $R^2$ des variables : 
+$$\begin{array}{ll}
+   R^2
+   &=\dfrac{In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}}{In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}}\\
+   &= \dfrac 1{29}\dsum{k=1}3W^k\dsum{j=1}{29}(\overline{x^j}^k)^2\\
+   &=\dfrac 1{29}\dsum{j=1}{29}\dsum{k=1}3W^k(\overline{x^j}^k)^2\\
+   &=\dfrac 1{29}\dsum{j=1}{29}(R^2)^j
+  \end{array}$$
+ce que nous vérifions aussi informatiquement. 
+
+
+
+\section{Partie II}
+\section{Annexe}
+
+\end{document}
