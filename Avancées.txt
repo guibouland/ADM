@@ -1,0 +1,5 @@
+je te fais un petit résumé de ce que j'ai fait:
+- j'ai ajouté les tableaux(peut être un peu trop même) ainsi que des commentaires en plus 
+-j'ai corrigé quelques fautes (désolé :) )
+-je t'ai ajouté un script R vierge pour que tu mettes toi ton script que tu avais fait lundi et qu'on puisse se le partager si on avance, comme ça chacun a son script et on prendra celui qu'on
+(ou si tu veux prendre le mien fait toi plaisir
