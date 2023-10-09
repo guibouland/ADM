@@ -3,14 +3,14 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage[margin=2cm, bottom=2cm]{geometry}
+\usepackage[margin=2cm, top=1.5cm, bottom=1.5cm]{geometry}
 % \usepackage{multicol}
 \usepackage{graphicx}
 \usepackage{calc}
 % \usepackage{slashbox}
 \usepackage{bbold}
 \usepackage{array}
-      
+\usepackage{minted}
 \usepackage{alltt}
 \usepackage{pstricks-add}
 \usepackage{pstricks}
@@ -26,7 +26,7 @@
 % \rfoot{\footnotesize{TP 1}}
 % \cfoot{}
 
-\title{TP 1 - Analyse des données multi-dimensionnelles}
+\title{TP 1 - Analyse des données multi-dimensionnelle}
 \author{Guillaume BOULAND\\ Camille MOTTIER}
 \date{}
 
@@ -36,10 +36,10 @@
 % 
 \newcommand{\dsum}[2]{\displaystyle\sum_{#1}^{#2}}
 % \newcommand{\dint}[2]{\displaystyle\int_{#1}^{#2}}
-% \newcommand{\ben}{\begin{enumerate}}
-% \newcommand{\een}{\end{enumerate}}
+\newcommand{\ben}{\begin{enumerate}}
+	\newcommand{\een}{\end{enumerate}}
 % \newcommand{\bit}{\begin{itemize}}
-% \newcommand{\eit}{\end{itemize}}
+	% \newcommand{\eit}{\end{itemize}}
 
 
 \setlength{\parindent}{0pt}
@@ -47,209 +47,449 @@
 
 \begin{document}
 \maketitle
-
+	
 \
-
+	
+Toutes les valeurs présentées dans ce document seront données avec une précision de $10^{-3}$.
 \section{Partie I}
-\subsection{Données quantitatives}
-Nous étudions ici des données relatives aux vins de Loire, contenues dans le fichier \texttt{wine.csv}. Dans ce fichier, sont présentés 21 vins selon le type d'appellations, de sol et de 29 paramètres quantitatifs d'intensités sensorielles. \\
-
+\subsection{Données quantitatives : étude du nuage de points}
+Nous étudions ici des données relatives aux vins de Loire, contenues dans le fichier \texttt{wine.csv}. Dans ce fichier, sont présentés 21 vins selon le type d'appellations, de sol et de 29 paramètres quantitatifs d'intensités sensorielles. 
+	
+\
+	
 \begin{table}[ht]
 	\centering
-	\begin{tabular}{rlllrrr}
+	\begin{tabular}{rlllrr}
 		\hline
-		& X & Label & Soil & Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake \\ 
+		Label & Soil & Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake \\ 
 		\hline
-		1 & 2EL  & Saumur & Env1 & 3.07 & 3.00 & 2.71 \\ 
-		2 & 1CHA & Saumur & Env1 & 2.96 & 2.82 & 2.38 \\ 
-		3 & 1FON & Bourgueuil & Env1 & 2.86 & 2.93 & 2.56 \\ 
-		4 & 1VAU & Chinon & Env2 & 2.81 & 2.59 & 2.42 \\ 
-		\hline
-	\end{tabular}
-	\caption{Extrait du tableau d'origine}
-\end{table}
-
-Nous commençons par extraire du tableau les variables quantitatives, puis nous les centrons et les réduisons afin de les ramener à une échelle comparable de valeurs. Nous considérons pour cela que les vins sont associés à un même poids : $\frac 1{21}$. 
-Nous appellerons par la suite $X$ ce nouveau tableau et $(x_i^j)$ ses composantes.\\
-
-\begin{table}[ht]
-	\centering
-	\begin{tabular}{rrrrrr}
-		\hline
-		& Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shale & Spice.bf.shake \\ 
-		\hline
-		1 & -0.13 & -0.23 & -0.00 & 1.59 & -0.13 \\ 
-		2 & -0.52 & -1.12 & -1.73 & 1.59 & -1.33 \\ 
-		3 & -0.90 & -0.58 & -0.79 & -0.69 & 0.37 \\ 
-		4 & -1.07 & -2.26 & -1.51 & -1.03 & 0.72 \\ 
+		2EL  & Saumur & Env1 & 3.074 & 3.000 & 2.714 \\ 
+		1CHA & Saumur & Env1 & 2.964 & 2.821 & 2.375 \\ 
+		1FON & Bourgueil & Env1 & 2.857 & 2.929 & 2.560 \\ 
+		1VAU & Chinon & Env2 & 2.808 & 2.593 & 2.417 \\
+		1DAM & Saumur & Reference & 3.607 & 3.429 & 3.154 \\
 		\hline
 	\end{tabular}
-	\caption{Extrait des valeurs centrées réduites}
+	\caption{Extrait du tableau d'origine} 
 \end{table}
-
-\underline{Barycentre du nuage de points} :\\
-
-Le barycentre $\overline{x}$ de ce nuage de points se trouve à l'origine. En effet, les variables étant centrées, nous avons : $$\forall j\in[\![1,29]\!],~\overline{x^j}=\dsum{i=1}{21}\frac 1{21}x_i^j=0.$$
-
-En notant $W$ la matrice diagonale de $\mathcal M_{21}(\R)$ des poids de chaque vin et $\mathbb 1$ la matrice colonne de $\mathcal  M_{21,1}(\R)$ composée de 1, nous obtenons aussi $\overline x$ par le produit matriciel $\overline x^T=X^TW\mathbb 1$, ce qui est exploité informatiquement pour vérifier le résultat précédent.\\
-
+	
+\
+	
+Nous commençons par extraire du tableau les variables quantitatives, que nous centrons et réduisons afin de les ramener à une échelle comparable de valeurs. Nous considérons pour cela que les vins sont associés à un même poids : $\frac 1{21}$. 
+Nous appellons $X$ ce nouveau tableau et $(x_i^j)$ ses composantes.
+	
+\
+	
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rrrrr}
-	\hline
-	& Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake  \\ 
-	\hline
-	1 & -0.00 & 0.00 & -0.00 & 0.00  \\ 
-	\hline
+		\hline
+		Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake & Spice.bf.shake \\ 
+		\hline
+		-0.131 & -0.228 & -0.000 & 1.591 & -0.135 \\ 
+		-0.521 & -1.120 & -1.728 & 1.591 & -1.332 \\ 
+		-0.900 & -0.582 & -0.785 & -0.692 & 0.366 \\ 
+		-1.073 & -2.256 & -1.514 & -1.028 & 0.721 \\ 
+		\hline
+	\end{tabular}
+	\caption{Extrait des valeurs centrées réduites} 
+\end{table}
+	
+\
+	
+\underline{Barycentre du nuage de points} :\\
+	
+Le barycentre $\overline{x}$ de ce nuage de points se trouve à l'origine. En effet, les variables étant centrées, nous avons : 
+$$\overline{x}=\left(\overline{x^j}\right)_{1\leqslant j\leqslant 29}=\left(\dsum{i=1}{21}\frac 1{21}x_i^j\right)_{1\leqslant j\leqslant 29}=0.$$
+	
+En notant $W$ la matrice diagonale de $\mathcal M_{21}(\R)$ des poids de chaque vin et $\mathbb 1$ la matrice colonne de $\mathcal  M_{21,1}(\R)$ dont toutes les composantes sont égales à 1, nous obtenons aussi $\overline x$ par le produit matriciel $\overline x'=X'W\mathbb 1$, ce qui est exploité informatiquement pour vérifier le résultat précédent.\\
+	
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rrrr}
+		\hline
+		Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake  \\ 
+		\hline
+		-0.000 & 0.000 & -0.000 & 0.000  \\ 
+		\hline
 	\end{tabular}
 	\caption{Barycentre du nuage}
 \end{table}
-{\red les approximations se sont faites toutes seules}\\
+	
+\vs1
+	
 \underline{Inertie du nuage de points} :\\
-
-Considérant la métrique canonique $I$ sur $\R^{29}$, nous obtenons l'inertie du nuage de points : 
+	
+Considérant la métrique canonique $I$ sur $\R^{29}$, nous obtenons par le calcul suivant l'inertie du nuage de points : 
 $$\begin{array}{ll}
-In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}
-&=\dsum{i=1}{21}\frac 1{21}|\!|x_i|\!|^2_I\\
-&=\dsum{i=1}{21}\frac 1{21}\dsum{j=1}{29}(x_i^j)^2\\
-&=\dsum{j=1}{29}\dsum{i=1}{21}\frac 1{21}(x_i^j)^2\\
-&=\dsum{j=1}{29}V(x^j) \hs{1} \text{car les $x^j$ sont centrés}\\
-&=29 \hs1 \text{car les $x^j$ sont réduits}
+	In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}
+	&=\dsum{i=1}{21}\frac 1{21}|\!|x_i|\!|^2_I\\
+	&=\dsum{i=1}{21}\frac 1{21}\dsum{j=1}{29}(x_i^j)^2\\
+	&=\dsum{j=1}{29}\dsum{i=1}{21}\frac 1{21}(x_i^j)^2\\
+	&=\dsum{j=1}{29}V(x^j) \\
+	&=\boxed{29} \hs1 \text{car les $x^j$ sont centrées et réduites.}
 \end{array}$$
-Résultat que nous retrouvons bien informatiquement. 
-
-
-
-
-
-
+	
+\
+	
+	
+	
 \subsection{Partition par appellations}
-
-Les vins sont séparés en trois appellations : Bourgueuil, Chinon et Saumur. \\
+	
+Les vins sont séparés en trois appellations : Bourgueil, Chinon et Saumur. \\
 Nous noterons $Y=(y_i^k)\in\mathcal M_{21,3}(\R)$ la matrice dont les colonnes sont les indicatrices d'appellations. \\
-Les poids des trois appellations sont obtenus par le produit matriciel $Y^TW\mathbb 1$. \\
-En effet, pour tout $k\in\{1,2,3\}$, $\dsum{i=1}{21}y_i^kw_i=\dsum{i/y_i=k}{}w_i=W^k$.\\
-Nous obtenons alors informatiquement les valeurs suivantes. \\
-
+Les poids globaux des trois appellations sont obtenus par le produit matriciel $Y'W\mathbb 1$ : \\
+%En effet, pour tout $k\in\{1,2,3\}$, $\dsum{i=1}{21}y_i^kw_i=\dsum{i/y_i=k}{}w_i=W^k$.\\
+%Nous obtenons alors informatiquement les valeurs suivantes. \\
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rr}
 		\hline
 		& Poids \\ 
 		\hline
-		Bourgueuil & 0.29 \\ 
-		Chinon & 0.19 \\ 
-		Saumur & 0.52 \\ 
+		Bourgueil & 0.286 \\ 
+		Chinon & 0.190 \\ 
+		Saumur & 0.524 \\ 
 		\hline
 	\end{tabular}
-	\caption{\underline{Poids par appellation}}
+	\caption{Poids par appellation} 
 \end{table}
-{\red Souligné ou non le titre des tableaux?}\\
-{\red à développer ???} De manière similaire, les barycentres au sein des trois appellations sont obtenus par le calcul matriciel $(\overline x^k)_{1\leqslant k\leqslant 3} =(Y^TWY)^{-1}(Y^TWX)\in \mathcal M_{3,29}(\R)$. En effet, $Y^TWY$ est la matrice diagonale des poids des appellations et $Y^TWX=\left(\dsum{i/y_i=k}{}w_ix_i^j\right)_{k,j}$ est la matrice des ``pseudo-moyennes'' par appellation.\\
-
+	
+\
+	
+Les barycentres au sein des trois appellations sont obtenus par le calcul matriciel suivant : 
+$$\left(\overline x^k\right)_{1\leqslant k\leqslant 3} =(Y'WY)^{-1}(Y'WX)\in \mathcal M_{3,29}(\R).$$ En effet, $Y'WY$ est la matrice diagonale des poids des appellations et $Y'WX=\left(\dsum{i/y_i=k}{}w_ix_i^j\right)_{k,j}$ est la matrice des ``pseudo-moyennes'' par appellation.\\
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rrrrrr}
 		\hline
 		& Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake & Spice.bf.shake \\ 
 		\hline
-		Bourgueuil & -0.63 & 0.08 & 0.04 & -0.18 & 0.04 \\ 
-		Chinon & -0.60 & -0.83 & 0.19 & -0.29 & -0.20 \\ 
-		Saumur & 0.56 & 0.26 & -0.09 & 0.20 & 0.05 \\ 
+		Bourgueil & -0.625 & 0.079 & 0.041 & -0.182 & 0.037 \\ 
+		Chinon & -0.595 & -0.835 & 0.187 & -0.287 & -0.198 \\ 
+		Saumur & 0.558 & 0.260 & -0.091 & 0.204 & 0.052 \\ 
 		\hline
 	\end{tabular}
-	\caption{Barycentre des appellations}
+	\caption{Barycentres des variables sensorielles par appellation - Extrait} 
 \end{table}
-
-Ces trois barycentres ont pour norme ...\\
+	
+Ces trois barycentres ont pour norme :\\
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rr}
 		\hline
 		& Normes \\ 
 		\hline
-		1 & 3.60 \\ 
-		2 & 5.40 \\ 
-		3 & 2.12 \\ 
+		Bourgueil & 3.604 \\ 
+		Chinon & 5.400 \\ 
+		Saumur & 2.120 \\ 
 		\hline
 	\end{tabular}
 	\caption{Normes des barycentres par appellation} 
 \end{table}
-{\red je sais pas si tu veux détailler le calcul avant ou pas?}\\
+
+\
 
 On obtient alors l'inertie inter-appellations : 
-$$In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}=\dsum{k=1}3W^k|\!|\overline x^k|\!|_I^2\simeq \text{\red valeur approchée $= 3,17$ si on prend deux chiffres après la virgule comme dans les tableaux}$$
+$$In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}=\dsum{k=1}3W^k|\!|\overline x^k|\!|_I^2\simeq  \boxed{3,169}$$
 
-puis le $R^2$ de la partition des vins en appellations : 
-$$R^2=\dfrac{In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}}{In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}}\simeq \text{\red valeur approchée $= 0,11$}$$
+puis le coefficient $R^2$ de la partition des vins en appellations : 
+$$R^2=\dfrac{In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}}{In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}}\simeq \boxed{0,109}$$
 
 Nous constatons ainsi que la part des appellations dans les disparités sensorielles des vins est d'environ $11\%$.
-
+	
+\vs{.5}
+	
 \subsection{Influence de l'appellation sur les différentes variables sensorielles}
-
-Il s'agit ici d'étudier séparément l'influence des appellations sur chaque variable sensorielle. On calcule donc pour chacune d'entre elles :
+	
+Il s'agit ici d'étudier séparément l'influence des appellations sur chaque variable sensorielle. On calcule donc pour chacune d'entre elles le coefficient $R^2$ :
 $$(R^2)^j=\dfrac{\dsum{k=1}3W^k(\overline{x^j}^k)^2}{V(x^j)}=\dsum{k=1}3W^k(\overline{x^j}^k)^2$$
-
-\begin{table}[ht]
-	\centering
-	\begin{tabular}{rrrrrr}
-		\hline
-		& Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake & Spice.bf.shake \\ 
-		\hline
-		1 & 0.34 & 0.17 & 0.01 & 0.05 & 0.01 \\ 
-		\hline
-	\end{tabular}
-	\caption{Extrait du résultat du $R^2$ de chaque variable sensorielle} 
-\end{table}
-
-Nous constatons que l'appellation est la moins influente sur les variables intitulées ``Spice.before.shaking'', ``Quality.of.odor'', ``Fruity'' et ``Flower'', avec une influence de moins de $1\%$, tandis qu'elle est la plus influente sur les variables intitulées ``Odor.intensity.before.shaking'', ``Odor.intensity'' et ``Phenolic'', avec une influence de plus de $30\%$. \\
+	
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rrrrr}
 		\hline
-		& Spice.before.shaking & Quality.of.odour & Fruity & Flower \\ 
+		Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake & Spice.bf.shake \\ 
 		\hline
-		1 & 0.01 & 0.01 & 0.01 & 0.01 \\ 
+		0.342 & 0.170 & 0.011 & 0.047 & 0.009 \\ 
 		\hline
 	\end{tabular}
-	\caption{Variables les moins liées à l'appellation} 
+	\caption{$R^2$ des variables sensorielles - Extrait} 
 \end{table}
+	
+\
+	
+Nous constatons que l'appellation est la moins influente sur les variables intitulées ``Spice.before.shaking'', ``Quality.of.odor'', ``Fruity'' et ``Flower'', avec une influence de moins de $1\%$, tandis qu'elle est la plus influente sur les variables intitulées ``Odor.intensity.before.shaking'', ``Odor.intensity'' et ``Phenolic'', avec une influence de plus de $30\%$. \\
+	
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rrrr}
 		\hline
-		& Odor.Int.before.shaking & Odor.Intensity & Phenolic \\ 
+		Spice.before.shaking & Quality.of.odour & Fruity & Flower \\ 
 		\hline
-		1 & 0.34 & 0.39 & 0.36 \\ 
+		0.009 & 0.008 & 0.007 & 0.009 \\ 
 		\hline
 	\end{tabular}
-	\caption{Variables les plus liées à l'appellation} 
+	\caption{Variables les moins liées à l'appellation} 
 \end{table}
-
-Notons que le $R^2$ de la partition est égal à la moyenne arithmétique des $R^2$ des variables : 
-$$\begin{array}{ll}
-   R^2
-   &=\dfrac{In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}}{In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}}\\
-   &= \dfrac 1{29}\dsum{k=1}3W^k\dsum{j=1}{29}(\overline{x^j}^k)^2\\
-   &=\dfrac 1{29}\dsum{j=1}{29}\dsum{k=1}3W^k(\overline{x^j}^k)^2\\
-   &=\dfrac 1{29}\dsum{j=1}{29}(R^2)^j
-  \end{array}$$
-Ce que nous vérifions aussi informatiquement.
+	
+\
+	
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{rrr}
 		\hline
-		& moy\_R2var & R2 \\ 
+		Odor.Int.before.shaking & Odor.Intensity & Phenolic \\ 
 		\hline
-		1 & 0.11 & 0.11 \\ 
+		0.342 & 0.391 & 0.360 \\ 
+		\hline
+	\end{tabular}
+	\caption{Variables les plus liées à l'appellation} 
+\end{table}
+	
+\
+	
+Remarquons que le $R^2$ de la partition est égal à la moyenne arithmétique des $R^2$ des variables sensorielles : 
+$$\begin{array}{ll}
+	R^2
+	&=\dfrac{In_{0}\{\overline x^k,W^k\}_{1\leqslant k\leqslant 3}}{In_0\{x_i,\frac 1{21}\}_{1\leqslant i\leqslant 21}}\\
+	&= \dfrac 1{29}\dsum{k=1}3W^k\dsum{j=1}{29}(\overline{x^j}^k)^2\\
+	&=\dfrac 1{29}\dsum{j=1}{29}\dsum{k=1}3W^k(\overline{x^j}^k)^2\\
+	&=\dfrac 1{29}\dsum{j=1}{29}(R^2)^j
+\end{array}$$
+	
+\
+	
+\begin{table}[!ht]
+	\centering
+	\begin{tabular}{rr}
+		\hline
+		moy\_R2var & R2 \\ 
+		\hline
+		0.109 & 0.109 \\ 
 		\hline
 	\end{tabular}
 	\caption{Vérification de l'égalité entre le $R^2$ et la moyenne arithmétique du $R^2$ des variables} 
 \end{table}
-\newpage
-{\red j'ai mis ça parce que sinon ça me mettait le tableau après les sections d'en dessous, un petit bug}\\
-
+	
+\vs1
+	
 \section{Partie II}
+	
+Dans cette partie, nous étudions l'influence des appellations et de la nature du sol sur les différentes variables sensorielles. Pour ce faire, nous utilisons les projections orthogonales sur les espaces engendrés par les modalités.
+	
+Nous notons ici $Y$ (respectivement $Z$) la matrice dont les colonnes sont les indicatrices d'appellations (respectivement de sol).
+	
+\
+	
+\subsection{Influence de l'appellation }
+	
+	
+\ben
+\item 
+$\dsum{k=1}3y^k=\mathbb 1$, donc $\mathbb 1\in \,<Y>$. De plus, $<Y^c>\,\subset \mathbb 1^{\bot}$. Donc $<Y>\,=\,<Y^c>\overset{\bot}+<\mathbb 1>$.\\
+Or, pour tout $j\in\{1,\ldots,29\}$, $x^j$ est centré donc est orthogonal à $\mathbb 1$. On a ainsi :  
+$$\boxed{\Pi_Yx^j=\Pi_{Y^c}x^j+\Pi_{\mathbb 1}x^j=\Pi_{Y^c}x^j}.$$ 
+	
+De plus, $\Pi_Yx^j=\left(\overline{x^j}^{Y_i}\right)_{1\leqslant i\leqslant 21}$ donc la norme de ce vecteur  peut être interprêtée ainsi : 
+$$|\!|\Pi_Yx^j|\!|_W^2=\dsum{k=1}3W^k\left(\overline{x^j}^k\right)^2=\boxed{(R^2)^j}\hs{.5}\text{(car $x^j$ est une variable réduite)}$$
+	
+	
+\item On considère les matrices de $\mathcal M_{21}(\R)$ des projections orthogonales sur $Y$ et sur $x^j$ : 
+$$\Pi_Y=Y(Y'WY)^{-1}Y'W ~~
+\text{et }\forall j\in\{1,29\},~
+\Pi_{x^j} = x^j (\underbrace{{x^j}' Wx^j}_{V(x^j)=1})^{-1} {x^j}' W = x^j {x^j}' W$$
+	
+%il y avait un conflit entre l'appostrophe et l'exposant j. Avec des accolades, plus de problème...
+	
+	
+La trace du produit de ces deux matrices permet d'obtenir à nouveau les $(R^2)^j$ des variables sensorielles :
+$$\text{tr}(\Pi_{x^j}\Pi_Y)=\text{tr}(\Pi_{Y}\Pi_{x^j})=\text{tr}(\Pi_{Y^c}\Pi_{x^j})=[\Pi_{Y^c}|\Pi_{x^j}]=(R^2)^j$$ 
+	
+	
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rrrrr}
+		\hline
+		Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake & Spice.bf.shake\\ 
+		\hline
+		0.342 & 0.170 & 0.011 & 0.047 & 0.009\\ 
+		\hline
+	\end{tabular}
+	\caption{$R^2$ de différentes variables sensorielles - Extrait} 
+\end{table}
+	
+	
+\item On introduit la matrice de $\mathcal M_{21}(\R)$ définie par : $R=XMX'W$. On a alors : 
+$$\begin{array}{ll}
+	\text{tr}(R\Pi_Y)
+	&= \text{tr}(XMX'W\Pi_Y)\\\vs{.1}
+	&= \dfrac 1{29}\text{tr}(X'W\Pi_YX)\\
+	&= \dfrac 1{29}\text{tr}\left(<x^j,\Pi_Yx^k>_W\right)_{j,k}\\
+	&= \dfrac 1{29}\dsum{j=1}{29}<x^j,\Pi_Yx^j>_W\\
+	&= \dfrac 1{29}\dsum{j=1}{29}|\!|\Pi_Yx^j|\!|_W^2\hs1\text{(car $\Pi_Y$ est auto-adjoint et idempotent})\\\vs{.1}
+	&= \dfrac 1{29}(R^2)^j\\
+	&=  \boxed{R^2}
+\end{array}$$
+	
+La trace de ce produit matriciel permet de retrouver le coefficient $R^2$ de la partition par appellations.
+	
+%pour la question d pour les rapprochement avec la partie 1
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rr}
+		\hline
+		traceRProjY & R2 \\ 
+		\hline
+		0.109 & 0.109\\ 
+		\hline
+	\end{tabular}
+	\caption{Vérification de l'égalité $\text{tr}(R\Pi_Y)=R^2$} 
+\end{table}
+	
+\item À l'aide des matrices de projections, et en exploitant les relations obtenues ci-dessus, nous retrouvons informatiquement les résultats de la partie I concernant l'influence des appellations sur les caractéristiques sensorielles des vins.
+	
+\een
+	
+\subsection{Influence du sol}
+	
+En procédant de manière similaire, nous pouvons étudier l'influence du sol sur les caractéristiques sensorielles des vins. Pour ce faire, nous utilisons la  projection sur l'espace engendré par les indicatrices de sols $\Pi_Z$. Nous obtenons alors les $R^2$ pour chaque variable sensorielle mais aussi le $R^2$ global pour les sols : 
+	
+$$\forall j\in\{1,\ldots,29 \},~(R^2)^j=\text{tr}(\Pi_{x^j}\Pi_Z) ~~\text{ et }~~R^2=\text{tr}(R\Pi_Z)\simeq \boxed{0,365}$$
+	
+	
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rrrrr}
+		\hline
+		Odor.Int.bf.shake & Aroma.qual.bf.shake & Fruity.bf.shake & Flower.bf.shake & Spice.bf.shake \\ 
+		\hline
+		0.534 & 0.415 & 0.323 & 0.347 & 0.558 \\ 
+		\hline
+	\end{tabular}
+	\caption{$R^2$ de différentes variables sensorielles pour les sols - Extrait} 
+\end{table}
+	
+\
+	
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{r}
+		\hline
+		TraceRProjZ \\ 
+		\hline
+		0.365 \\ 
+		\hline
+	\end{tabular}
+	\caption{$R^2$ pour le sol} 
+\end{table}
+	
+\
+	
+	
+La nature du sol explique donc environ $37\%$ des disparités sensorielles entre les vins de Loire donc est un élément fortement plus explicatif que l'appellation. 
+	
+	
+	
+	
 \section{Annexe}
-
+	
+\begin{minted}[bgcolor=gray!10]{R}
+	wine <- read.csv("wine.csv")
+	
+	X <- wine[4:32]
+	W <- diag(1/21 , nr=21)
+	M <- diag(1/29, 29)
+	Unit <- matrix(data=c(1), nrow=21, ncol=1)
+	
+	Xc<- sqrt(21/20)*scale(X)
+	X <- Xc
+	#Matrice des indicatrices des appellations
+	Y <- matrix(0, nrow=21, ncol=3)
+	for (i in 1:21) {
+		if (wine[i,2]=="Bourgueuil") {Y[i,1]<-1};
+		if (wine[i, 2]=="Chinon") {Y[i,2]<-1};
+		if (wine[i, 2]=="Saumur") {Y[i,3]<-1}
+	}
+	#Matrice des indicatrices des sols
+	Z <- matrix(0, nrow=21, ncol=4)
+	for (i in 1:21) {
+		if (wine[i,3]=="Env1") {Z[i,1]<-1};
+		if (wine[i, 3]=="Env2") {Z[i,2]<-1};
+		if (wine[i, 3]=="Reference") {Z[i,3]<-1};
+		if (wine[i, 3]=="Env4") {Z[i, 4]<-1}
+	}
+	
+	#Barycentres des variables sensorielles
+	Bar <- t(X) %*% W %*% Unit
+	
+	#Inertie totale du nuage
+	In = sum(apply(1/21*X^2 ,1, sum))
+	
+	#Poids et barycentre par appellation 
+	Poids_app <- t(Y)%*%W%*%Unit
+	
+	Moy_cat= solve(t(Y)%*%W%*%Y)%*%t(Y)%*%W%*%X
+	
+	#Calcul normes euclidiennes
+	Normes<- apply(Moy_cat^2, 1, sum)
+	
+	#Calcul de l'inertie inter-appellations
+	In_inter <- Normes%*%Poids_app
+	
+	#Calcul du R^2
+	R2 <- In_inter/In
+	
+	#Variance inter-appellation
+	var_inter <- t(Poids_app)%*%Moy_cat^2
+	R2var<- var_inter
+	
+	
+	#Variables les moins liées à l'appellation
+	subset(R2var, select = R2var<0.01)
+	
+	#Variables les plus liées à l'appellation
+	subset(R2var, select = R2var>0.33)
+	
+	#Calcul de la moy arithmétique du R2 des variables
+	moy_R2var<-mean(R2var)
+	
+	#Vérifification de l'égalité entre le R2 et la moy arithmétique du R2 des variables
+	delta<- moy_R2var - R2
+	
+	
+	#PARTIE 2
+	
+	#Projection sur Y
+	projy <- Y %*% solve(t(Y) %*%W%*% Y) %*% t(Y)%*%W
+	
+	#fonction de la projection sur les différrentes variables
+	projxj<-function(j) {
+		proj <- X[,j] %*% solve(t(X[,j]) %*%W%*% X[,j]) %*% t(X[,j])%*%W
+		
+		return(proj)
+	}
+	#Matrice de toutes les traces (pour tous les j) du produit Proj_xj*Proj_Y
+	V2 <- matrix( 0, nrow=1, ncol=29)
+	for (j in 1:29) {
+		V2[,j]<- sum(diag(projxj(j)%*%projy))
+	}
+	
+	#Trace du produit R*proj_Y
+	R = X%*%M%*%t(X)%*%W
+	R_Y = R%*%projy
+	traceRY <-sum(diag(R_Y))
+	
+	#Trace de proj_xj*proj_Z
+	projz <- Z %*% solve(t(Z) %*%W%*% Z) %*% t(Z)%*%W
+	V3 <- matrix(0, nrow=1, ncol=29)
+	for (j in 1:29) {
+		V3[,j]<- sum(diag(projxj(j)%*%projz))
+	}
+	
+	#Trace de R*projz
+	traceRprojz <- sum(diag(R%*%projz))
+\end{minted}
+	
+	
 \end{document}
