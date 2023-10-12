@@ -5,6 +5,7 @@ Xc<- sqrt(21/20)*scale(X)
 W <-diag(1/21 , nr=21)
 print(xtable(Xc[1:4,1:5] , type = "latex", file = "TP1.tex", caption='Extrait des valeurs centrées réduites'))
 
+Unit <- matrix(data=c(1), nrow=21, ncol=1)
 
 #Calcul des barycentres des variables quantitatives
 Bar <- t(Xc) %*% W %*% Unit
@@ -16,8 +17,6 @@ print(xtable(Bar , type = "latex", file = "TP1.tex", caption ='Barycentre du nua
 In = sum(apply(1/21*Xc^2 ,1, sum))
 
 
-
-Unit<- matrix(data=c(1), nrow=21, ncol=1)
 
 C <- matrix(0, nrow=21, ncol=3)
 for (i in 1:21) {
